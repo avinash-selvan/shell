@@ -6,41 +6,47 @@ import (
 	"os"
 	"strings"
 	"os/exec"
-	"log"
+	"io"
 )
 
+func takeInput() (string, error){
+	reader := bufio.NewReader(os.Stdin)
+	clBuff, err := reader.ReadString('\n')
+	if err != nil{
+		return "", err
+	}
+	clBuff = strings.TrimSpace(clBuff)
+
+	return clBuff, nil
+}
+
 func runShell(){
-	exit:=false
-	for exit!=true{
+	for{
 		fmt.Print("myshell> ")
-		reader := bufio.NewReader(os.Stdin)
-		command,err:=reader.ReadString('\n')
-		if err!=nil{
-			fmt.Println("Error:",err)
-			exit = true
+
+		command,err := takeInput()
+		if err == io.EOF{
+			fmt.Println("0 bytes available in input stream")
+			break
+		}
+		if err != nil{
+			fmt.Println("Error during Read:",err)
+		}
+		token := strings.Fields(command)
+		if len(token) == 0{
 			continue
 		}
-		command = strings.TrimSpace(command)
-		fmt.Println("You typed:",command)
 
-		token := strings.Fields(command)
-
-		pro := exec.Command(token[0])
+		pro := exec.Command(token[0], token[1:]...)
+		pro.Stdout = os.Stdout
+		pro.Stderr = os.Stderr
 		err = pro.Run()
 		if err != nil {
-                        log.Fatal(err)
+                        fmt.Println(err)
                 }
-		stdOut, err := pro.StdoutPipe() 
-                if err != nil{
-                        log.Fatal(err)
-                }
-
-		if err = pro.Wait(); err!=nil{
-			log.Fatal(err)
-		}
-		fmt.Printf("%s\n",stdOut)
+		
 		if(command == "exit"){
-			exit = true
+			break
 		}
 
 	}
