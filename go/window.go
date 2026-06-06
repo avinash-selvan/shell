@@ -22,7 +22,7 @@ func takeInput() (string, error){
 
 func runShell(){
 	for{
-		fmt.Print("myshell> ")
+		fmt.Print("Avi's Shell (Type 'exit' to quit)> ")
 
 		command,err := takeInput()
 		if err == io.EOF{
@@ -36,6 +36,10 @@ func runShell(){
 		if len(token) == 0{
 			continue
 		}
+		if(token[0] =="exit"){
+			fmt.Println("Bye-Bye")
+			break
+		}
 
 		pro := exec.Command(token[0], token[1:]...)
 		pro.Stdout = os.Stdout
@@ -44,11 +48,5 @@ func runShell(){
 		if err != nil {
                         fmt.Println(err)
                 }
-		
-		if(command == "exit"){
-			break
-		}
-
 	}
-	fmt.Println("Out of loop")
 }
