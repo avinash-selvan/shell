@@ -20,6 +20,14 @@ func takeInput() (string, error){
 	return clBuff, nil
 }
 
+func cd(dir string) error{
+	err := os.Chdir(dir)
+	if (err != nil){
+		return err
+	}
+	return nil
+}
+
 func runShell(){
 	for{
 		fmt.Print("Avi's Shell (Type 'exit' to quit)> ")
@@ -39,6 +47,14 @@ func runShell(){
 		if(token[0] =="exit"){
 			fmt.Println("Bye-Bye")
 			break
+		}
+		if(token[0] == "cd") {
+			fmt.Println("attempting to change dir to:",token[1:])
+			err := cd(token[1:][0])
+			if(err!=nil){
+				fmt.Println("Error while change dir",err)
+			}
+			continue
 		}
 
 		pro := exec.Command(token[0], token[1:]...)
